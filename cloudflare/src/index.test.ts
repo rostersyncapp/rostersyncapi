@@ -32,16 +32,36 @@ describe('RosterSync Gateway - Rosters Endpoints', () => {
       put: vi.fn(),
     };
 
-    const res = await app.request('/v1/rosters', {
-      method: 'GET',
-      headers: {
-        'Authorization': `Bearer ${TEST_API_KEY}`
+    // Mock global fetch
+    const originalFetch = globalThis.fetch;
+    globalThis.fetch = vi.fn().mockImplementation((url) => {
+      if (url.includes('/rest/v1/rosters')) {
+        return Promise.resolve({
+          ok: true,
+          status: 200,
+          json: () => Promise.resolve([{ id: '1', team_name: 'Test Team' }])
+        });
       }
-    }, {
-      ROSTERSYNC_KV: mockKv,
-      SUPABASE_URL: 'https://test.supabase.co'
-    });
+      return Promise.resolve({ ok: false, status: 404 });
+    }) as any;
 
-    expect(res.status).toBe(200);
+    try {
+      const res = await app.request('/v1/rosters', {
+        method: 'GET',
+        headers: {
+          'Authorization': `Bearer ${TEST_API_KEY}`
+        }
+      }, {
+        ROSTERSYNC_KV: mockKv,
+        SUPABASE_URL: 'https://test.supabase.co'
+      });
+
+      expect(res.status).toBe(200);
+      const body = await res.json() as any;
+      expect(body.success).toBe(true);
+      expect(body.data).toHaveLength(1);
+    } finally {
+      globalThis.fetch = originalFetch;
+    }
   });
 });

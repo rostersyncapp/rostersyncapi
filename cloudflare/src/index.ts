@@ -171,9 +171,10 @@ app.get('/v1/athletes/:name', async (c) => {
   const tier = c.get('tier') || 'free';
 
   try {
+    const anonKey = await c.env.ROSTERSYNC_KV.get('config:supabase_anon_key');
     const supabaseRes = await fetch(`${c.env.SUPABASE_URL}/rest/v1/global_player_enrichment?player_name=ilike.${encodeURIComponent(name)}&select=*`, {
       headers: {
-        'apikey': c.env.ROSTERSYNC_KV.get('config:supabase_anon_key') as any || '',
+        'apikey': anonKey || '',
         'Content-Type': 'application/json'
       }
     });
@@ -195,6 +196,44 @@ app.get('/v1/athletes/:name', async (c) => {
     return c.json({
       success: true,
       data: data[0],
+      meta: {
+        request_id: reqId,
+        timestamp: new Date().toISOString(),
+        tier
+      }
+    });
+  } catch (err: any) {
+    return c.json({
+      success: false,
+      error: {
+        code: 'INTERNAL_ERROR',
+        message: 'An error occurred on the Supabase origin server.',
+        request_id: reqId
+      }
+    }, 500);
+  }
+});
+
+// 5. ROSTERS ENDPOINT
+app.get('/v1/rosters', async (c) => {
+  const reqId = c.get('requestId') || crypto.randomUUID();
+  const tier = c.get('tier') || 'free';
+  
+  try {
+    const anonKey = await c.env.ROSTERSYNC_KV.get('config:supabase_anon_key');
+    const supabaseRes = await fetch(`${c.env.SUPABASE_URL}/rest/v1/rosters?select=*`, {
+      headers: {
+        'apikey': anonKey || '',
+        'Content-Type': 'application/json'
+      }
+    });
+
+    if (!supabaseRes.ok) throw new Error('Supabase origin failed');
+    const data = await supabaseRes.json();
+
+    return c.json({
+      success: true,
+      data,
       meta: {
         request_id: reqId,
         timestamp: new Date().toISOString(),

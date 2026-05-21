@@ -2,11 +2,11 @@
 
 ## Phase 1: Basic Roster Endpoints
 
-*   - [~] Task: Implement `GET /v1/rosters` endpoint using existing `public.rosters` and/or `public.reference_rosters` tables.
+*   - [x] Task: Implement `GET /v1/rosters` endpoint using existing `public.rosters` and/or `public.reference_rosters` tables. d8a4c21
     *   - [x] Sub-task: Write tests for `GET /v1/rosters` endpoint (should return all roster data).
-    *   - [~] Sub-task: Implement `GET /v1/rosters` endpoint (fetch all data from `public.rosters` and/or `public.reference_rosters` tables).
-*   - [ ] Task: Implement `GET /v1/rosters/{teamId}` endpoint using existing `public.rosters` and/or `public.reference_rosters` tables.
-    *   - [ ] Sub-task: Write tests for `GET /v1/rosters/{teamId}` endpoint (should return roster data for a specific team).
+    *   - [x] Sub-task: Implement `GET /v1/rosters` endpoint (fetch all data from `public.rosters` and/or `public.reference_rosters` tables).
+*   - [~] Task: Implement `GET /v1/rosters/{teamId}` endpoint using existing `public.rosters` and/or `public.reference_rosters` tables.
+    *   - [~] Sub-task: Write tests for `GET /v1/rosters/{teamId}` endpoint (should return roster data for a specific team).
     *   - [ ] Sub-task: Implement `GET /v1/rosters/{teamId}` endpoint (fetch data for a specific team).
 *   - [ ] Task: Conductor - User Manual Verification 'Basic Roster Endpoints' (Protocol in workflow.md)
 
