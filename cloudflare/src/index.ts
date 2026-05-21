@@ -340,8 +340,9 @@ app.get('/v1/rosters/:teamIdentifier', async (c) => {
     const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(teamIdentifier);
 
     if (!isUuid) {
-      // Look up team by slug or abbreviation
-      const teamRes = await fetch(`${c.env.SUPABASE_URL}/rest/v1/teams?select=id&or=(slug.eq.${teamIdentifier.toLowerCase()},abbreviation.eq.${teamIdentifier.toUpperCase()})`, { headers });
+      // Look up team by slug, abbreviation, or name (fallback)
+      const nameMatch = encodeURIComponent(`*${teamIdentifier.replace(/-/g, ' ')}*`);
+      const teamRes = await fetch(`${c.env.SUPABASE_URL}/rest/v1/teams?select=id&or=(slug.eq.${teamIdentifier.toLowerCase()},abbreviation.eq.${teamIdentifier.toUpperCase()},name.ilike.${nameMatch})`, { headers });
       
       if (!teamRes.ok) {
         console.error(`Team Lookup Error (${teamRes.status}):`, await teamRes.text());
