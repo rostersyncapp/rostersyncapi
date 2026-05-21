@@ -326,6 +326,7 @@ app.get('/v1/rosters', async (c) => {
 app.get('/v1/rosters/:teamIdentifier', async (c) => {
   const teamIdentifier = c.req.param('teamIdentifier');
   const season = c.req.query('season');
+  const leagueFilter = c.req.query('league');
   const reqId = c.get('requestId') || crypto.randomUUID();
   const tier = c.get('tier') || 'free';
   
@@ -342,7 +343,13 @@ app.get('/v1/rosters/:teamIdentifier', async (c) => {
     if (!isUuid) {
       // Look up team by slug, abbreviation, or name (fallback)
       const nameMatch = encodeURIComponent(`*${teamIdentifier.replace(/-/g, ' ')}*`);
-      const teamRes = await fetch(`${c.env.SUPABASE_URL}/rest/v1/teams?select=id&or=(slug.eq.${teamIdentifier.toLowerCase()},abbreviation.eq.${teamIdentifier.toUpperCase()},name.ilike.${nameMatch})`, { headers });
+      let teamQuery = `select=id,name,league,abbreviation&or=(slug.eq.${teamIdentifier.toLowerCase()},abbreviation.eq.${teamIdentifier.toUpperCase()},name.ilike.${nameMatch})`;
+      
+      if (leagueFilter) {
+        teamQuery += `&league=eq.${leagueFilter.toLowerCase()}`;
+      }
+
+      const teamRes = await fetch(`${c.env.SUPABASE_URL}/rest/v1/teams?${teamQuery}`, { headers });
       
       if (!teamRes.ok) {
         console.error(`Team Lookup Error (${teamRes.status}):`, await teamRes.text());
@@ -350,16 +357,31 @@ app.get('/v1/rosters/:teamIdentifier', async (c) => {
       }
       
       const teamData = await teamRes.json() as any[];
+      
       if (!teamData || teamData.length === 0) {
         return c.json({
           success: false,
           error: {
             code: 'RESOURCE_NOT_FOUND',
-            message: `Team '${teamIdentifier}' was not found.`,
+            message: `Team '${teamIdentifier}' was not found${leagueFilter ? ` in league '${leagueFilter}'` : ''}.`,
             request_id: reqId
           }
         }, 404);
       }
+
+      // Handle Collisions (e.g., LAC matching Clippers and Chargers)
+      if (teamData.length > 1 && !leagueFilter) {
+        return c.json({
+          success: false,
+          error: {
+            code: 'AMBIGUOUS_IDENTIFIER',
+            message: `The identifier '${teamIdentifier}' matches multiple teams. Please specify a 'league' query parameter to disambiguate.`,
+            matches: teamData.map(t => ({ id: t.id, name: t.name, league: t.league, abbreviation: t.abbreviation })),
+            request_id: reqId
+          }
+        }, 300); // 300 Multiple Choices
+      }
+
       targetTeamId = teamData[0].id;
     }
 
