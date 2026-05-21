@@ -137,14 +137,19 @@ app.get('/v1/leagues', async (c) => {
   const tier = c.get('tier') || 'free';
   
   try {
+    const anonKey = await c.env.ROSTERSYNC_KV.get('config:supabase_anon_key');
     const supabaseRes = await fetch(`${c.env.SUPABASE_URL}/rest/v1/leagues?select=*&is_active=eq.true`, {
       headers: {
-        'apikey': c.env.ROSTERSYNC_KV.get('config:supabase_anon_key') as any || '',
+        'apikey': anonKey || '',
         'Content-Type': 'application/json'
       }
     });
 
-    if (!supabaseRes.ok) throw new Error('Supabase origin failed');
+    if (!supabaseRes.ok) {
+      const errorText = await supabaseRes.text();
+      console.error(`Supabase Error (${supabaseRes.status}):`, errorText);
+      throw new Error('Supabase origin failed');
+    }
     const data = await supabaseRes.json();
 
     return c.json({
@@ -183,7 +188,11 @@ app.get('/v1/athletes/:name', async (c) => {
       }
     });
 
-    if (!supabaseRes.ok) throw new Error('Supabase origin failed');
+    if (!supabaseRes.ok) {
+      const errorText = await supabaseRes.text();
+      console.error(`Supabase Error (${supabaseRes.status}):`, errorText);
+      throw new Error('Supabase origin failed');
+    }
     const data = await supabaseRes.json() as any[];
 
     if (!data || data.length === 0) {
@@ -281,7 +290,11 @@ app.get('/v1/rosters', async (c) => {
       }
     });
 
-    if (!supabaseRes.ok) throw new Error('Supabase origin failed');
+    if (!supabaseRes.ok) {
+      const errorText = await supabaseRes.text();
+      console.error(`Supabase Error (${supabaseRes.status}):`, errorText);
+      throw new Error('Supabase origin failed');
+    }
     const data = await supabaseRes.json();
 
     return c.json({
@@ -327,7 +340,11 @@ app.get('/v1/rosters/:teamId', async (c) => {
       }
     });
 
-    if (!supabaseRes.ok) throw new Error('Supabase origin failed');
+    if (!supabaseRes.ok) {
+      const errorText = await supabaseRes.text();
+      console.error(`Supabase Error (${supabaseRes.status}):`, errorText);
+      throw new Error('Supabase origin failed');
+    }
     const data = await supabaseRes.json() as any[];
 
     if (!data || data.length === 0) {
