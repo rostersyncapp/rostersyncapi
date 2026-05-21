@@ -28,7 +28,6 @@ app.use('*', async (c, next) => {
     return next();
   }
 
-  /* TEMPORARILY DISABLED FOR TESTING
   const authHeader = c.req.header('Authorization');
   if (!authHeader || !authHeader.startsWith('Bearer ')) {
     return c.json({
@@ -100,19 +99,16 @@ app.use('*', async (c, next) => {
 
   // Increment Rate Limit count
   await c.env.ROSTERSYNC_KV.put(rateLimitKey, String(currentRequests + 1), { expirationTtl: 120 });
-  */
 
-  // Attach default context and metadata for testing
-  c.set('orgId', 'test-org');
-  c.set('tier', 'enterprise');
+  // Attach context and metadata to request context
+  c.set('orgId', keyMeta.organization_id);
+  c.set('tier', keyMeta.tier);
   c.set('requestId', crypto.randomUUID());
 
-  /*
   // Inject rate limiting headers into response
   c.header('X-RateLimit-Limit', String(keyMeta.rate_limit_rpm));
   c.header('X-RateLimit-Remaining', String(keyMeta.rate_limit_rpm - currentRequests - 1));
   c.header('X-RateLimit-Reset', String(Math.ceil(Date.now() / 60000) * 60000));
-  */
 
   await next();
 });
@@ -283,10 +279,21 @@ app.get('/v1/rosters', async (c) => {
   const page = Math.max(1, parseInt(c.req.query('page') || '1'));
   const limit = Math.min(100, Math.max(1, parseInt(c.req.query('limit') || '50')));
   const offset = (page - 1) * limit;
+  const league = c.req.query('league') || c.req.query('leagueId');
+  const position = c.req.query('position');
   
   try {
     const anonKey = await c.env.ROSTERSYNC_KV.get('config:supabase_anon_key');
-    const supabaseRes = await fetch(`${c.env.SUPABASE_URL}/rest/v1/reference_rosters?select=*&limit=${limit}&offset=${offset}`, {
+    let supabaseUrl = `${c.env.SUPABASE_URL}/rest/v1/reference_rosters?select=*&limit=${limit}&offset=${offset}`;
+
+    if (league) {
+      supabaseUrl += `&league_id=eq.${league.toLowerCase()}`;
+    }
+    if (position) {
+      supabaseUrl += `&roster_data=cs.[{"position":"${position.toUpperCase()}"}]`;
+    }
+
+    const supabaseRes = await fetch(supabaseUrl, {
       headers: {
         'apikey': anonKey || '',
         'Content-Type': 'application/json'
@@ -322,7 +329,82 @@ app.get('/v1/rosters', async (c) => {
   }
 });
 
-// 7. ROSTER BY TEAM ENDPOINT
+// 7. PLAYER DETAILS ENDPOINT
+app.get('/v1/rosters/players/:playerId', async (c) => {
+  const playerId = c.req.param('playerId');
+  const reqId = c.get('requestId') || crypto.randomUUID();
+  const tier = c.get('tier') || 'free';
+  
+  try {
+    const anonKey = await c.env.ROSTERSYNC_KV.get('config:supabase_anon_key');
+    const headers = {
+      'apikey': anonKey || '',
+      'Content-Type': 'application/json'
+    };
+
+    // Use Postgres JSONB array containment to find the specific player in any roster
+    const supabaseUrl = `${c.env.SUPABASE_URL}/rest/v1/reference_rosters?roster_data=cs.[{"id":"${playerId}"}]&select=team_id,roster_data`;
+    const supabaseRes = await fetch(supabaseUrl, { headers });
+
+    if (!supabaseRes.ok) {
+      const errorText = await supabaseRes.text();
+      console.error(`Supabase Error (${supabaseRes.status}):`, errorText);
+      throw new Error('Supabase origin failed');
+    }
+    
+    const data = await supabaseRes.json() as any[];
+
+    if (!data || data.length === 0) {
+      return c.json({
+        success: false,
+        error: {
+          code: 'RESOURCE_NOT_FOUND',
+          message: `Player with ID '${playerId}' was not found in any roster.`,
+          request_id: reqId
+        }
+      }, 404);
+    }
+
+    // Extract the specific player object from the array
+    const teamData = data[0];
+    const player = teamData.roster_data.find((p: any) => p.id === playerId);
+
+    if (!player) {
+       return c.json({
+        success: false,
+        error: {
+          code: 'INTERNAL_ERROR',
+          message: `Player found in roster but could not be extracted.`,
+          request_id: reqId
+        }
+      }, 500);
+    }
+
+    return c.json({
+      success: true,
+      data: {
+        team_id: teamData.team_id,
+        player: player
+      },
+      meta: {
+        request_id: reqId,
+        timestamp: new Date().toISOString(),
+        tier
+      }
+    });
+  } catch (err: any) {
+    return c.json({
+      success: false,
+      error: {
+        code: 'INTERNAL_ERROR',
+        message: 'An error occurred on the Supabase origin server.',
+        request_id: reqId
+      }
+    }, 500);
+  }
+});
+
+// 8. ROSTER BY TEAM ENDPOINT
 app.get('/v1/rosters/:teamIdentifier', async (c) => {
   const teamIdentifier = c.req.param('teamIdentifier');
   const season = c.req.query('season');
