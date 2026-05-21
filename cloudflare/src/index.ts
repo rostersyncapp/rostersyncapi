@@ -218,7 +218,56 @@ app.get('/v1/athletes/:name', async (c) => {
   }
 });
 
-// 5. ROSTERS ENDPOINT
+// 5. TEAMS ENDPOINT
+app.get('/v1/teams', async (c) => {
+  const league = c.req.query('league');
+  const reqId = c.get('requestId') || crypto.randomUUID();
+  const tier = c.get('tier') || 'free';
+
+  try {
+    const anonKey = await c.env.ROSTERSYNC_KV.get('config:supabase_anon_key');
+    let supabaseUrl = `${c.env.SUPABASE_URL}/rest/v1/teams?select=id,name,display_name,league,sport,abbreviation`;
+    
+    if (league) {
+      supabaseUrl += `&league=eq.${league}`;
+    }
+
+    const supabaseRes = await fetch(supabaseUrl, {
+      headers: {
+        'apikey': anonKey || '',
+        'Content-Type': 'application/json'
+      }
+    });
+
+    if (!supabaseRes.ok) {
+      const errorText = await supabaseRes.text();
+      console.error(`Supabase Error (${supabaseRes.status}):`, errorText);
+      throw new Error('Supabase origin failed');
+    }
+    const data = await supabaseRes.json();
+
+    return c.json({
+      success: true,
+      data,
+      meta: {
+        request_id: reqId,
+        timestamp: new Date().toISOString(),
+        tier
+      }
+    });
+  } catch (err: any) {
+    return c.json({
+      success: false,
+      error: {
+        code: 'INTERNAL_ERROR',
+        message: 'An error occurred on the Supabase origin server.',
+        request_id: reqId
+      }
+    }, 500);
+  }
+});
+
+// 6. ROSTERS ENDPOINT
 app.get('/v1/rosters', async (c) => {
   const reqId = c.get('requestId') || crypto.randomUUID();
   const tier = c.get('tier') || 'free';
