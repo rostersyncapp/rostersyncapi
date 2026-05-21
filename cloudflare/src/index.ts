@@ -252,4 +252,54 @@ app.get('/v1/rosters', async (c) => {
   }
 });
 
+// 6. ROSTER BY ID ENDPOINT
+app.get('/v1/rosters/:teamId', async (c) => {
+  const teamId = c.req.param('teamId');
+  const reqId = c.get('requestId') || crypto.randomUUID();
+  const tier = c.get('tier') || 'free';
+  
+  try {
+    const anonKey = await c.env.ROSTERSYNC_KV.get('config:supabase_anon_key');
+    const supabaseRes = await fetch(`${c.env.SUPABASE_URL}/rest/v1/rosters?id=eq.${teamId}&select=*`, {
+      headers: {
+        'apikey': anonKey || '',
+        'Content-Type': 'application/json'
+      }
+    });
+
+    if (!supabaseRes.ok) throw new Error('Supabase origin failed');
+    const data = await supabaseRes.json() as any[];
+
+    if (!data || data.length === 0) {
+      return c.json({
+        success: false,
+        error: {
+          code: 'RESOURCE_NOT_FOUND',
+          message: `Roster with ID '${teamId}' was not found.`,
+          request_id: reqId
+        }
+      }, 404);
+    }
+
+    return c.json({
+      success: true,
+      data: data[0],
+      meta: {
+        request_id: reqId,
+        timestamp: new Date().toISOString(),
+        tier
+      }
+    });
+  } catch (err: any) {
+    return c.json({
+      success: false,
+      error: {
+        code: 'INTERNAL_ERROR',
+        message: 'An error occurred on the Supabase origin server.',
+        request_id: reqId
+      }
+    }, 500);
+  }
+});
+
 export default app;

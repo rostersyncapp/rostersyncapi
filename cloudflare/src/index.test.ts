@@ -64,4 +64,58 @@ describe('RosterSync Gateway - Rosters Endpoints', () => {
       globalThis.fetch = originalFetch;
     }
   });
+
+  it('GET /v1/rosters/:teamId - should return 200 and roster data for a specific team', async () => {
+    // Mock KV for Auth
+    const mockKv = {
+      get: vi.fn().mockImplementation((key) => {
+        if (key === `key:${HASHED_KEY}`) {
+          return JSON.stringify({
+            active: true,
+            organization_id: 'test-org',
+            tier: 'pro',
+            rate_limit_rpm: 100
+          });
+        }
+        if (key === 'config:supabase_anon_key') {
+          return 'mock-anon-key';
+        }
+        return null;
+      }),
+      put: vi.fn(),
+    };
+
+    // Mock global fetch
+    const teamId = 'test-team-uuid';
+    const originalFetch = globalThis.fetch;
+    globalThis.fetch = vi.fn().mockImplementation((url) => {
+      if (url.includes(`/rest/v1/rosters?id=eq.${teamId}&select=*`)) {
+        return Promise.resolve({
+          ok: true,
+          status: 200,
+          json: () => Promise.resolve([{ id: teamId, team_name: 'Specific Team' }])
+        });
+      }
+      return Promise.resolve({ ok: false, status: 404 });
+    }) as any;
+
+    try {
+      const res = await app.request(`/v1/rosters/${teamId}`, {
+        method: 'GET',
+        headers: {
+          'Authorization': `Bearer ${TEST_API_KEY}`
+        }
+      }, {
+        ROSTERSYNC_KV: mockKv,
+        SUPABASE_URL: 'https://test.supabase.co'
+      });
+
+      expect(res.status).toBe(200);
+      const body = await res.json() as any;
+      expect(body.success).toBe(true);
+      expect(body.data.id).toBe(teamId);
+    } finally {
+      globalThis.fetch = originalFetch;
+    }
+  });
 });
