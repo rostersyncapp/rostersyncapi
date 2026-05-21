@@ -10,7 +10,7 @@
     *   - [x] Sub-task: Implement `GET /v1/rosters/{teamId}` endpoint (fetch data for a specific team).
 *   - [x] Task: Conductor - User Manual Verification 'Basic Roster Endpoints' (Protocol in workflow.md) 17c570f
 
-## Phase 2: Advanced Roster Data Endpoints & Filtering
+## Phase 2: Advanced Roster Data Endpoints & Filtering [checkpoint: 541753c]
 
 *   - [x] Task: Implement `GET /v1/rosters/players/{playerId}` endpoint.
     *   - [x] Sub-task: Write tests for `GET /v1/rosters/players/{playerId}` endpoint (should return player details).
@@ -20,4 +20,4 @@
     *   - [x] Sub-task: Implement filtering by `leagueId`.
     *   - [x] Sub-task: Write tests for `GET /v1/rosters?position={pos}` filtering.
     *   - [x] Sub-task: Implement filtering by `position`.
-*   - [ ] Task: Conductor - User Manual Verification 'Advanced Roster Data Endpoints & Filtering' (Protocol in workflow.md)
+*   - [x] Task: Conductor - User Manual Verification 'Advanced Roster Data Endpoints & Filtering' (Protocol in workflow.md) 541753c
