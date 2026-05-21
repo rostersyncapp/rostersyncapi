@@ -153,12 +153,11 @@
 ```
 GET  /v1/status                           - API health + data freshness
 GET  /v1/leagues                          - List all supported leagues
-GET  /v1/leagues/{id}/teams              - Teams in a league
-GET  /v1/teams/{id}                      - Team details
-GET  /v1/teams/{id}/roster               - Current roster (default: current season)
-GET  /v1/teams/{id}/roster?season=2025   - Specific season roster
-GET  /v1/teams/{id}/history              - All historical rosters (paginated)
-GET  /v1/teams/{id}/export?format=vizrt  - Broadcast export (vizrt, ross, chyron)
+GET  /v1/teams                            - List all teams (supports ?league={id} filtering)
+GET  /v1/rosters                          - Global paginated roster dump (supports ?page & ?limit)
+GET  /v1/rosters/{teamIdentifier}         - Roster by UUID, slug, abbreviation, or name fallback
+GET  /v1/rosters/{teamIdentifier}?season=2026 - Roster filtered by season year
+GET  /v1/rosters/{teamIdentifier}?league=nfl  - Disambiguate teams sharing an abbreviation (e.g., LAC)
 GET  /v1/athletes/{id}                   - Athlete profile + AI enrichment
 GET  /v1/athletes/{id}/intelligence      - AI phonetics, translations, narratives
 POST /v1/athletes/{id}/corrections       - Submit data correction
@@ -173,6 +172,19 @@ POST /v1/keys/rotate                     - Rotate API key
 - **API keys**: Managed in `api_keys` table with `rate_limit`, `tier`, `active`
 - **Key scoping**: `read` (default) or `read-write` (for webhook/correction endpoints)
 - **IP allowlisting**: Optional for Enterprise tier
+
+### Error Handling
+
+The API returns standard HTTP status codes along with a structured JSON error object.
+
+| Code | HTTP Status | Description |
+|------|-------------|-------------|
+| `INVALID_API_KEY` | 401 | Missing or invalid Authorization header. |
+| `FORBIDDEN` | 403 | API key is deactivated or lacks permissions. |
+| `RESOURCE_NOT_FOUND` | 404 | The requested team, roster, or athlete does not exist. |
+| `RATE_LIMIT_EXCEEDED` | 429 | Request limit for the current tier has been exceeded. |
+| `INTERNAL_ERROR` | 500 | An error occurred on the origin database. |
+| `AMBIGUOUS_IDENTIFIER`| 300 | The team identifier (e.g. abbreviation) matched multiple teams. The response body will include a `matches` array containing the conflicting teams. Add a `?league=` query parameter to disambiguate. |
 
 ### Response Envelope (All Endpoints)
 
