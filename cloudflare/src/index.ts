@@ -221,7 +221,7 @@ app.get('/v1/rosters', async (c) => {
   
   try {
     const anonKey = await c.env.ROSTERSYNC_KV.get('config:supabase_anon_key');
-    const supabaseRes = await fetch(`${c.env.SUPABASE_URL}/rest/v1/rosters?select=*`, {
+    const supabaseRes = await fetch(`${c.env.SUPABASE_URL}/rest/v1/reference_rosters?select=*`, {
       headers: {
         'apikey': anonKey || '',
         'Content-Type': 'application/json'
@@ -260,7 +260,7 @@ app.get('/v1/rosters/:teamId', async (c) => {
   
   try {
     const anonKey = await c.env.ROSTERSYNC_KV.get('config:supabase_anon_key');
-    const supabaseRes = await fetch(`${c.env.SUPABASE_URL}/rest/v1/rosters?id=eq.${teamId}&select=*`, {
+    const supabaseRes = await fetch(`${c.env.SUPABASE_URL}/rest/v1/reference_rosters?team_id=eq.${teamId}&select=*`, {
       headers: {
         'apikey': anonKey || '',
         'Content-Type': 'application/json'
