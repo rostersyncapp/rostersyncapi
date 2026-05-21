@@ -1,0 +1,23 @@
+{
+  "name": "rostersyncapi",
+  "version": "1.0.0",
+  "description": "> Autonomous AI-operated roster data API for broadcast & sports media.",
+  "main": "index.js",
+  "directories": {
+    "doc": "docs"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev:gateway": "cd cloudflare && npm run dev",
+    "deploy:gateway": "cd cloudflare && npm run deploy"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "dependencies": {
+    "@google/generative-ai": "^0.24.1",
+    "@supabase/supabase-js": "^2.105.4",
+    "tsx": "^4.22.0"
+  }
+}

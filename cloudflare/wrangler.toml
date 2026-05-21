@@ -1,0 +1,10 @@
+name = "rostersync-gateway"
+main = "src/index.ts"
+compatibility_date = "2024-01-01"
+
+[vars]
+SUPABASE_URL = "https://rddqcxfalrlmlvirjlca.supabase.co"
+
+[[kv_namespaces]]
+binding = "ROSTERSYNC_KV"
+id = "e58eae8879604b19ae5da68cd9a5587a"
