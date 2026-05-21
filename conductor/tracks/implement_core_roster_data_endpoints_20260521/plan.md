@@ -1,6 +1,6 @@
 # Plan: Implement Core Roster Data Endpoints
 
-## Phase 1: Basic Roster Endpoints
+## Phase 1: Basic Roster Endpoints [checkpoint: 17c570f]
 
 *   - [x] Task: Implement `GET /v1/rosters` endpoint using existing `public.rosters` and/or `public.reference_rosters` tables. d8a4c21
     *   - [x] Sub-task: Write tests for `GET /v1/rosters` endpoint (should return all roster data).
@@ -8,7 +8,7 @@
 *   - [x] Task: Implement `GET /v1/rosters/{teamId}` endpoint using existing `public.rosters` and/or `public.reference_rosters` tables. 7441c8f
     *   - [x] Sub-task: Write tests for `GET /v1/rosters/{teamId}` endpoint (should return roster data for a specific team).
     *   - [x] Sub-task: Implement `GET /v1/rosters/{teamId}` endpoint (fetch data for a specific team).
-*   - [ ] Task: Conductor - User Manual Verification 'Basic Roster Endpoints' (Protocol in workflow.md)
+*   - [x] Task: Conductor - User Manual Verification 'Basic Roster Endpoints' (Protocol in workflow.md) 17c570f
 
 ## Phase 2: Advanced Roster Data Endpoints & Filtering
 
