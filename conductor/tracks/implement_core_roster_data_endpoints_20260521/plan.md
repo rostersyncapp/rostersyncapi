@@ -12,12 +12,12 @@
 
 ## Phase 2: Advanced Roster Data Endpoints & Filtering
 
-*   - [ ] Task: Implement `GET /v1/rosters/players/{playerId}` endpoint.
-    *   - [ ] Sub-task: Write tests for `GET /v1/rosters/players/{playerId}` endpoint (should return player details).
-    *   - [ ] Sub-task: Implement `GET /v1/rosters/players/{playerId}` endpoint (fetch player details).
-*   - [ ] Task: Add filtering to `GET /v1/rosters` endpoint.
-    *   - [ ] Sub-task: Write tests for `GET /v1/rosters?leagueId={id}` filtering.
-    *   - [ ] Sub-task: Implement filtering by `leagueId`.
-    *   - [ ] Sub-task: Write tests for `GET /v1/rosters?position={pos}` filtering.
-    *   - [ ] Sub-task: Implement filtering by `position`.
+*   - [x] Task: Implement `GET /v1/rosters/players/{playerId}` endpoint.
+    *   - [x] Sub-task: Write tests for `GET /v1/rosters/players/{playerId}` endpoint (should return player details).
+    *   - [x] Sub-task: Implement `GET /v1/rosters/players/{playerId}` endpoint (fetch player details).
+*   - [x] Task: Add filtering to `GET /v1/rosters` endpoint.
+    *   - [x] Sub-task: Write tests for `GET /v1/rosters?leagueId={id}` filtering.
+    *   - [x] Sub-task: Implement filtering by `leagueId`.
+    *   - [x] Sub-task: Write tests for `GET /v1/rosters?position={pos}` filtering.
+    *   - [x] Sub-task: Implement filtering by `position`.
 *   - [ ] Task: Conductor - User Manual Verification 'Advanced Roster Data Endpoints & Filtering' (Protocol in workflow.md)
