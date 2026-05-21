@@ -280,10 +280,13 @@ app.get('/v1/teams', async (c) => {
 app.get('/v1/rosters', async (c) => {
   const reqId = c.get('requestId') || crypto.randomUUID();
   const tier = c.get('tier') || 'free';
+  const page = Math.max(1, parseInt(c.req.query('page') || '1'));
+  const limit = Math.min(100, Math.max(1, parseInt(c.req.query('limit') || '50')));
+  const offset = (page - 1) * limit;
   
   try {
     const anonKey = await c.env.ROSTERSYNC_KV.get('config:supabase_anon_key');
-    const supabaseRes = await fetch(`${c.env.SUPABASE_URL}/rest/v1/reference_rosters?select=*`, {
+    const supabaseRes = await fetch(`${c.env.SUPABASE_URL}/rest/v1/reference_rosters?select=*&limit=${limit}&offset=${offset}`, {
       headers: {
         'apikey': anonKey || '',
         'Content-Type': 'application/json'
@@ -303,7 +306,8 @@ app.get('/v1/rosters', async (c) => {
       meta: {
         request_id: reqId,
         timestamp: new Date().toISOString(),
-        tier
+        tier,
+        pagination: { page, limit, offset }
       }
     });
   } catch (err: any) {
@@ -318,27 +322,53 @@ app.get('/v1/rosters', async (c) => {
   }
 });
 
-// 6. ROSTER BY ID ENDPOINT
-app.get('/v1/rosters/:teamId', async (c) => {
-  const teamId = c.req.param('teamId');
+// 7. ROSTER BY TEAM ENDPOINT
+app.get('/v1/rosters/:teamIdentifier', async (c) => {
+  const teamIdentifier = c.req.param('teamIdentifier');
   const season = c.req.query('season');
   const reqId = c.get('requestId') || crypto.randomUUID();
   const tier = c.get('tier') || 'free';
   
   try {
     const anonKey = await c.env.ROSTERSYNC_KV.get('config:supabase_anon_key');
-    let supabaseUrl = `${c.env.SUPABASE_URL}/rest/v1/reference_rosters?team_id=eq.${teamId}&select=*`;
+    const headers = {
+      'apikey': anonKey || '',
+      'Content-Type': 'application/json'
+    };
+
+    let targetTeamId = teamIdentifier;
+    const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(teamIdentifier);
+
+    if (!isUuid) {
+      // Look up team by slug or abbreviation
+      const teamRes = await fetch(`${c.env.SUPABASE_URL}/rest/v1/teams?select=id&or=(slug.eq.${teamIdentifier.toLowerCase()},abbreviation.eq.${teamIdentifier.toUpperCase()})`, { headers });
+      
+      if (!teamRes.ok) {
+        console.error(`Team Lookup Error (${teamRes.status}):`, await teamRes.text());
+        throw new Error('Supabase origin failed during team lookup');
+      }
+      
+      const teamData = await teamRes.json() as any[];
+      if (!teamData || teamData.length === 0) {
+        return c.json({
+          success: false,
+          error: {
+            code: 'RESOURCE_NOT_FOUND',
+            message: `Team '${teamIdentifier}' was not found.`,
+            request_id: reqId
+          }
+        }, 404);
+      }
+      targetTeamId = teamData[0].id;
+    }
+
+    let supabaseUrl = `${c.env.SUPABASE_URL}/rest/v1/reference_rosters?team_id=eq.${targetTeamId}&select=*`;
     
     if (season) {
       supabaseUrl += `&season_year=eq.${season}`;
     }
 
-    const supabaseRes = await fetch(supabaseUrl, {
-      headers: {
-        'apikey': anonKey || '',
-        'Content-Type': 'application/json'
-      }
-    });
+    const supabaseRes = await fetch(supabaseUrl, { headers });
 
     if (!supabaseRes.ok) {
       const errorText = await supabaseRes.text();
@@ -352,7 +382,7 @@ app.get('/v1/rosters/:teamId', async (c) => {
         success: false,
         error: {
           code: 'RESOURCE_NOT_FOUND',
-          message: `Roster with ID '${teamId}' was not found.`,
+          message: `Roster for team '${teamIdentifier}' was not found.`,
           request_id: reqId
         }
       }, 404);
@@ -364,7 +394,8 @@ app.get('/v1/rosters/:teamId', async (c) => {
       meta: {
         request_id: reqId,
         timestamp: new Date().toISOString(),
-        tier
+        tier,
+        resolved_team_id: targetTeamId
       }
     });
   } catch (err: any) {
