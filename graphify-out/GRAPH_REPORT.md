@@ -1,12 +1,12 @@
 # Graph Report - rostersyncapi  (2026-06-16)
 
 ## Corpus Check
-- 146 files · ~3,021,407 words
+- 146 files · ~3,021,399 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
-- 432 nodes · 509 edges · 14 communities detected
-- Extraction: 81% EXTRACTED · 19% INFERRED · 0% AMBIGUOUS · INFERRED: 98 edges (avg confidence: 0.8)
+- 432 nodes · 510 edges · 14 communities detected
+- Extraction: 81% EXTRACTED · 19% INFERRED · 0% AMBIGUOUS · INFERRED: 99 edges (avg confidence: 0.8)
 - Token cost: 0 input · 0 output
 
 ## Community Hubs (Navigation)
@@ -26,7 +26,7 @@
 - [[_COMMUNITY_Community 17|Community 17]]
 
 ## God Nodes (most connected - your core abstractions)
-1. `createClient()` - 34 edges
+1. `createClient()` - 35 edges
 2. `decryptCredentials()` - 12 edges
 3. `ConnectorAgent` - 10 edges
 4. `encryptCredentials()` - 7 edges
@@ -61,7 +61,7 @@ Nodes (13): callModel(), extractJSON(), getModelName(), ArchiveAgent, Environmen
 
 ### Community 2 - "Community 2"
 Cohesion: 0.05
-Nodes (25): signIn(), signInWithGoogle(), signOut(), signUp(), POST(), DashboardLayout(), GET(), handleSubmit() (+17 more)
+Nodes (26): signIn(), signInWithGoogle(), signOut(), signUp(), POST(), DashboardLayout(), GET(), handleSubmit() (+18 more)
 
 ### Community 3 - "Community 3"
 Cohesion: 0.08
@@ -117,13 +117,13 @@ Nodes (2): enqueueLeague(), main()
 _Questions this graph is uniquely positioned to answer:_
 
 - **Why does `createClient()` connect `Community 2` to `Community 3`, `Community 4`?**
-  _High betweenness centrality (0.199) - this node is a cross-community bridge._
+  _High betweenness centrality (0.206) - this node is a cross-community bridge._
 - **Why does `createScopedClient()` connect `Community 4` to `Community 2`?**
-  _High betweenness centrality (0.125) - this node is a cross-community bridge._
+  _High betweenness centrality (0.129) - this node is a cross-community bridge._
 - **Why does `syncTeamRosterToDAMAction()` connect `Community 2` to `Community 7`?**
   _High betweenness centrality (0.046) - this node is a cross-community bridge._
-- **Are the 33 inferred relationships involving `createClient()` (e.g. with `signIn()` and `signUp()`) actually correct?**
-  _`createClient()` has 33 INFERRED edges - model-reasoned connections that need verification._
+- **Are the 34 inferred relationships involving `createClient()` (e.g. with `signIn()` and `signUp()`) actually correct?**
+  _`createClient()` has 34 INFERRED edges - model-reasoned connections that need verification._
 - **Are the 9 inferred relationships involving `decryptCredentials()` (e.g. with `getDAMConnections()` and `saveDAMConnection()`) actually correct?**
   _`decryptCredentials()` has 9 INFERRED edges - model-reasoned connections that need verification._
 - **Are the 4 inferred relationships involving `encryptCredentials()` (e.g. with `saveDAMConnection()` and `GET()`) actually correct?**
