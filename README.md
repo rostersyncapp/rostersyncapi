@@ -74,3 +74,4 @@ rostersyncapi (API Service)        ← THIS PROJECT
 - [ ] Phase 2: Features (intelligence endpoints, broadcast exports)
 - [ ] Phase 3: Autonomy (monitoring, billing, alerting)
 - [x] Phase 4: DAM Native Connectors (ConnectorAgent implemented for Iconik, CatDV, Webhook)
+# rostersyncapi
