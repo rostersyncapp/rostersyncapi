@@ -71,9 +71,10 @@ def start_server(port=3000):
     
     print(f"🚀 Starting preview on port {port}...")
     
+    cmd_str = " ".join(cmd) if isinstance(cmd, list) else cmd
     with open(LOG_FILE, "w") as log:
         process = subprocess.Popen(
-            cmd,
+            cmd_str,
             cwd=str(root),
             stdout=log,
             stderr=log,

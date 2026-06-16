@@ -34,7 +34,8 @@ except:
 SKIP_DIRS = {
     'node_modules', '.next', 'dist', 'build', '.git', '.github',
     '__pycache__', '.vscode', '.idea', 'coverage', 'test', 'tests',
-    '__tests__', 'spec', 'docs', 'documentation', 'examples'
+    '__tests__', 'spec', 'docs', 'documentation', 'examples',
+    '.agent', '.antigravitycli', 'graphify-out'
 }
 
 # Files to skip (not pages)
@@ -102,8 +103,8 @@ def check_page(file_path: Path) -> dict:
     except Exception as e:
         return {"file": str(file_path.name), "issues": [f"Error: {e}"]}
     
-    # Detect if this is a layout/template file (has Head component)
-    is_layout = 'Head>' in content or '<head' in content.lower()
+    # Detect if this is a layout/template file (has Head component or head tag)
+    is_layout = 'Head>' in content or bool(re.search(r'<head\b', content.lower()))
     
     # 1. Title tag
     has_title = '<title' in content.lower() or 'title=' in content or 'Head>' in content

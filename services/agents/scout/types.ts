@@ -4,6 +4,8 @@ export interface RosterPlayer {
     jersey?: string;
     position: string;
     teamId: string;
+    height?: string;
+    weight?: string;
 }
 
 export interface IRosterFetchingStrategy {

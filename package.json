@@ -7,7 +7,10 @@
     "doc": "docs"
   },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "test": "npm run test --prefix cloudflare -- --run",
     "dev:gateway": "cd cloudflare && npm run dev",
     "deploy:gateway": "cd cloudflare && npm run deploy"
   },
@@ -17,7 +20,24 @@
   "type": "commonjs",
   "dependencies": {
     "@google/generative-ai": "^0.24.1",
+    "@stripe/stripe-js": "^9.7.0",
+    "@supabase/ssr": "^0.10.3",
     "@supabase/supabase-js": "^2.105.4",
+    "axios": "^1.16.1",
+    "dotenv": "^17.4.2",
+    "next": "^14.1.0",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "stripe": "^22.2.0",
     "tsx": "^4.22.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.11.0",
+    "@types/react": "^18.2.0",
+    "autoprefixer": "^10.4.17",
+    "postcss": "^8.4.35",
+    "tailwindcss": "^3.4.1",
+    "typescript": "^5.3.3",
+    "wrangler": "^4.93.1"
   }
 }

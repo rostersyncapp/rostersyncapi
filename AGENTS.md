@@ -15,6 +15,7 @@ This file provides context for AI agents (like Jules) to manage the RosterSync d
 
 ### Tier 3: Enterprise Delivery (B2B)
 - **ConnectorAgent**: Synchronizes enriched metadata to customer DAMs (Iconik, CatDV) and broadcast systems (Ross, Vizrt).
+- **DAMAgent**: The intelligent translation layer for Digital Asset Management (DAM) platforms, responsible for API schema compliance, metadata mapping, and credential verification.
 - **MCP Proxy**: Acts as an Intelligence Wrapper, exposing RosterSync tools directly to external AI agents (Claude, Custom Bots).
 
 ## 🛡️ Data Integrity Rules (Append-Only)
@@ -25,6 +26,7 @@ This file provides context for AI agents (like Jules) to manage the RosterSync d
 ## 🎓 Specialized Skills
 Agents working on this repository MUST use the following project-specific skills:
 - **`rostersync-api`**: Protocols for DAM integration, field mapping, and secure delivery.
+- **`rostersync-dam`**: Guidelines, specifications, and API mapping references for external DAM platforms (Iconik, CatDV, Webhooks).
 - **`rostersync-mcp`**: Tool definitions and agent chaining for the Intelligence Server.
 - **`mcp-troubleshooter`**: Troubleshoot and diagnose MCP server transport, schema, and runtime errors.
 - **`mcp-builder`**: Design, author, and architect MCP servers and tools for the RosterSync ecosystem.

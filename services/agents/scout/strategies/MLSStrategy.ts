@@ -97,7 +97,9 @@ export class MLSStrategy implements IRosterFetchingStrategy {
                 name: p.fullName,
                 jersey: p.jersey,
                 position: p.position?.abbreviation || "ATH",
-                teamId: teamId
+                teamId: teamId,
+                height: p.displayHeight || (p.height ? p.height.toString() : undefined),
+                weight: p.displayWeight || (p.weight ? p.weight.toString() : undefined)
               });
             }
           }

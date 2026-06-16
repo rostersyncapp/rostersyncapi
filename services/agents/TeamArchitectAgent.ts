@@ -6,11 +6,9 @@ import { EnvironmentAgent } from './EnvironmentAgent.ts';
 import { IntelligenceCacheService } from '../IntelligenceCacheService.ts';
 
 export class TeamArchitectAgent extends Agent {
-  private apiKey: string;
 
   constructor(apiKey: string) {
     super(apiKey);
-    this.apiKey = apiKey;
   }
 
   protected getTools(): any[] {

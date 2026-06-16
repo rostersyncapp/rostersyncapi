@@ -8,7 +8,7 @@ export class NHLStrategy implements IRosterFetchingStrategy {
     
     // NHL API uses abbreviations like BOS, CHI, etc.
     const teamCode = info.id as string;
-    const nhlSeason = `${season}${season + 1}`;
+    const nhlSeason = `${season - 1}${season}`;
     
     const url = `https://api-web.nhle.com/v1/roster/${teamCode}/${nhlSeason}`;
     console.log(`[NHL] Fetching: ${url}`);
@@ -27,7 +27,9 @@ export class NHLStrategy implements IRosterFetchingStrategy {
         name: `${p.firstName.default} ${p.lastName.default}`,
         jersey: p.sweaterNumber?.toString() || "00",
         position: p.positionCode || "ATH",
-        teamId: teamCode
+        teamId: teamCode,
+        height: p.heightInInches ? `${Math.floor(p.heightInInches / 12)}'${p.heightInInches % 12}"` : undefined,
+        weight: p.weightInPounds ? p.weightInPounds.toString() : undefined
       });
       data.forwards?.forEach((p: any) => athletes.push(processPlayer(p)));
       data.defensemen?.forEach((p: any) => athletes.push(processPlayer(p)));

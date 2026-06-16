@@ -1,5 +1,10 @@
 # RosterSync API - Broadcast Roster API Service
 
+> [!WARNING]
+> **ARCHIVED**: This document has been archived as part of the DAM-Only pivot. RosterSync has shifted from a public REST API architecture to a DAM-automation service.
+> 
+> *For the active MVP plan, see [DAM-Only Pivot: Implementation Plan](file:///Users/rymacmini/dev/rostersyncapi/docs/dam-only_implementation.md).*
+
 ## Product Overview
 
 | Aspect | Value |
@@ -92,36 +97,37 @@
 
 ### Base Tiers
 
-| Tier | Price | Calls/mo | Leagues | History | Support |
-|------|-------|----------|---------|---------|---------|---------|
-| **Free** | $0 | 100 | All 18 | Current | - |
-| **Starter** | $199/mo | 5K | All 18 | Current | Email |
-| **Pro** | $499/mo | 25K | All 18 | 5 years | Email |
-| **Editorial AI** | $999/mo | 75K | All 18 | 10 years | Priority Email |
-| **Enterprise** | $1,499/mo | Unlimited | All 18 | 25 years | Dedicated |
+| Tier | Price | Sync | Leagues | History | AI Enrichment | Support |
+|------|-------|------|---------|---------|---------------|---------|
+| **Trial** | $0 (14-day) | 1 DAM + graphics | 3 NCAA + 1 pro | Current | - | Email |
+| **Indie** | $199/mo | 1 DAM + graphics | 3 NCAA + 1 pro | 3 years | - | Email (24h) |
+| **Studio** | $399/mo | 2 DAM + graphics | All 18 | 5 years | 500/mo (phonetics + translations) | Priority (8h) |
+| **Network** (Q3 2026) | $999/mo | 3 DAM + webhook | All 18 | 10 years | 5K/mo (incl. Momentum + MCP) | Dedicated engineer |
+| **Enterprise** | $2,499/mo | Unlimited DAM | All 18 | 25 years | 50K/mo (everything) | 24/7 hotline |
 
-### Add-Ons (Monthly)
+### Bundled Features (AI enrichment no longer an add-on — see per-tier caps above)
 
-| Add-On | Price | Description |
-|--------|-------|-------------|
-| **AI Phonetics** | +$200/mo | Pronunciation guides (IPA + simplified) |
-| **AI Translations** | +$150/mo | Spanish/Mandarin translations |
-| **Broadcast Exports** | +$300/mo | Vizrt, Ross, Chyron, ICONIK formats |
-| **Webhook Push** | +$300/mo | Real-time custom webhook notifications (any HTTP endpoint) |
-| **DAM Connectors** | +$500/mo | Native DAM integrations (Iconik, CatDV) + generic webhook |
-| **MCP Server Access** | +$400/mo | For Pro tier customers who want AI-native access (Included in Editorial/Enterprise) |
-| **Historical Deep** | +$500/mo | Full 25-year archive |
+| Feature | Indie | Studio | Network | Enterprise |
+|---------|-------|--------|---------|------------|
+| **DAM Sync** | 1 connector | 2 connectors | 3 connectors + webhook | Unlimited |
+| **Graphics Export** (Vizrt, Ross, Chyron) | ✅ | ✅ | ✅ | ✅ |
+| **AI Phonetics** | — | ✅ | ✅ | ✅ |
+| **AI Translations** | — | ✅ | ✅ | ✅ |
+| **Momentum Pulses** | — | — | ✅ | ✅ |
+| **MCP Server** | — | — | ✅ | ✅ |
+| **Webhook Push** | — | — | ✅ | ✅ |
+| **Spotter Board / Booth Mode** | — | — | — | ✅ |
+| **25-year Archive** | — | — | — | ✅ |
 
-### Example Customer Contracts
+### Example Customer Fit
 
-| Customer Type | Package | Add-Ons | Monthly |
-|-------------|---------|---------|---------|
-| Indie developer | Starter | - | $199 |
-| Local TV affiliate | Pro | AI Phonetics | $699 |
-| Sports betting app | Enterprise | Webhook Push | $1,799 |
-| National network | Enterprise | All add-ons | $2,950 |
-| Digital Media House| Editorial AI | AI Translations | $1,149 |
-| Custom broadcast partner | Custom | Everything | $10K-25K |
+| Customer Type | Tier | Monthly |
+|-------------|------|---------|
+| Single pro team (e.g. Boston Bruins) | Indie | $199 |
+| D1 college athletics program | Indie | $199 |
+| Regional RSN (3 leagues, 2 studios) | Studio | $399 |
+| Sports betting content team | Network (Q3 2026) | $999 |
+| National broadcast network | Enterprise | $2,499 |
 
 ---
 
@@ -821,21 +827,9 @@ POST /v1/athletes/{id}/corrections
 
 > **Lesson Learned**: The Gemma 2B "echo" incident (May 2026) demonstrated that small models produce unreliable phonetics. All production enrichment must use models with ≥8B parameters. This is now enforced in the LinguistAgent prompt and documented as a hard rule.
 
-### 3. Pricing Tier Adjustment
+### 3. Pricing Tier Adjustment (Superseded)
 
-The current jump from Pro ($499) to Enterprise ($1,499) is a 3x gap that may lose mid-market customers. Recommendation:
-
-#### Revised Tiers
-
-| Tier | Price | Calls/mo | Leagues | History | Support |
-|------|-------|----------|---------|---------|---------|
-| **Free** | $0 | 100 | All 18 | Current | - |
-| **Starter** | $199/mo | 5K | All 18 | Current | Email |
-| **Pro** | $499/mo | 25K | All 18 | 5 years | Email |
-| **Business** | $999/mo | 75K | All 18 | 10 years | Priority Email |
-| **Enterprise** | $1,499/mo | Unlimited | All 18 | 25 years | Dedicated |
-
-> **Rationale**: The Business tier captures regional sports networks and mid-size betting platforms that need more than 5 years of history but don't require unlimited calls or dedicated support.
+*Note: The tier structure below is from a prior draft. The current (launched) tiers are Trial/Indie/Studio with Network and Enterprise as future tiers. See the Pricing Structure section above for live tiers.*
 
 ### 4. Infrastructure Cost Realism
 
@@ -1009,10 +1003,9 @@ Retry-After: 3600
 
 | Tier | Strategy | Limit |
 |------|----------|-------|
-| **Free** | Fixed window | 100/month (hard cap) |
-| **Starter** | Token bucket | 5K/month, burst 50/min |
-| **Pro** | Token bucket | 25K/month, burst 200/min |
-| **Business** | Token bucket | 75K/month, burst 500/min |
+| **Trial / Indie** | Token bucket | Unlimited, 60 RPM |
+| **Studio** | Token bucket | Unlimited, 100 RPM |
+| **Network** (planned) | Token bucket | Unlimited, 300 RPM |
 | **Enterprise** | Sliding window | Unlimited, 1000/min soft cap |
 
 ### 7.6 Versioning — ✅ Correct Choice

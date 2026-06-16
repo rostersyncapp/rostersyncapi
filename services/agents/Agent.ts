@@ -24,6 +24,46 @@ export abstract class Agent {
   }
 
   protected async callModel(prompt: string, context?: string): Promise<any> {
+    const provider = process.env.AI_PROVIDER || 'gemini';
+
+    if (provider === 'openrouter') {
+      const openRouterModel = process.env.OPENROUTER_MODEL || 'google/gemini-2.0-flash-lite-001';
+      try {
+        const result = await withRetry(async () => {
+          const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
+            method: 'POST',
+            headers: {
+              'Authorization': `Bearer ${this.apiKey}`,
+              'Content-Type': 'application/json',
+              'HTTP-Referer': 'https://rostersync.com',
+              'X-Title': 'RosterSync'
+            },
+            body: JSON.stringify({
+              model: openRouterModel,
+              messages: [
+                {
+                  role: 'user',
+                  content: prompt
+                }
+              ]
+            })
+          });
+
+          if (!response.ok) {
+            throw new Error(`OpenRouter API responded with status ${response.status}: ${await response.text()}`);
+          }
+
+          const data: any = await response.json();
+          return data.choices?.[0]?.message?.content || '';
+        }, { maxRetries: 3, initialDelay: 100 }, context);
+
+        return this.extractJSON(result);
+      } catch (err) {
+        console.error(`[${context}] ❌ OpenRouter Call Failed:`, err);
+        throw err;
+      }
+    }
+
     const modelName = this.getModelName();
 
     try {

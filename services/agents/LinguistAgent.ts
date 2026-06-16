@@ -15,11 +15,10 @@ export interface LinguisticEnrichment {
  * Simple. Fast. Standardized.
  */
 export class LinguistAgent extends Agent {
-  async enrichAthletes(names: string[], sport: string): Promise<LinguisticEnrichment[]> {
+  async enrichAthletes(names: string[], sport: string, customChunkSize: number = 10): Promise<LinguisticEnrichment[]> {
     if (names.length === 0) return [];
 
-    // Optimized for Local Ollama
-    const chunkSize = 10;
+    const chunkSize = customChunkSize;
     const allResults: LinguisticEnrichment[] = [];
 
     for (let i = 0; i < names.length; i += chunkSize) {

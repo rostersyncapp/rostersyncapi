@@ -15,10 +15,13 @@ Returns specifically the AI-generated data.
 ## 2. Broadcast Integrations
 Generate data formats compatible with industry-standard broadcast graphic engines.
 
-### 2.1 `GET /v1/teams/{teamIdentifier}/export?format={format}&season={year}`
-- **Formats:** `vizrt` (XML), `ross` (JSON), `chyron` (JSON/CSV).
-- **Logic:** Fetch the team roster for the specified season and map fields to the legacy structure required by the requested format.
-- **Phonetics:** Include `phonetic_name` in the export payload.
+### 2.1 `GET /v1/teams/{teamIdentifier}/export?format={format}&type={type}&season={year}`
+- **Formats:** `vizrt`, `ross`, `chyron`
+- **Types (`type` parameter):** `xml`, `json`, `csv` (each of the three formats supports all three types)
+- **Logic:** Fetch the team roster for the specified season, retrieve the team logo (from the database), and map the fields/structure according to the requested format and type.
+- **Phonetics:** Include `phonetic_name` (AI-enriched) in the export payload.
+- **Download GUI:** Add a direct download button in the RosterSync Hub interface to download the export payload as a file for each of the combinations.
+
 
 ## 3. Delta Feed
 Allow consumers to poll for changes rather than full datasets.

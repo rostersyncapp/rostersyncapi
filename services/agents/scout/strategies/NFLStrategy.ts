@@ -71,6 +71,8 @@ export class NFLStrategy implements IRosterFetchingStrategy {
       const posIdx = headers.indexOf('position');
       const jerseyIdx = headers.indexOf('jersey_number');
       const idIdx = headers.indexOf('gsis_id');
+      const heightIdx = headers.indexOf('height');
+      const weightIdx = headers.indexOf('weight');
 
       const players: RosterPlayer[] = [];
       
@@ -84,12 +86,24 @@ export class NFLStrategy implements IRosterFetchingStrategy {
       for (let i = 1; i < lines.length; i++) {
         const row = this.parseCsvLine(lines[i]);
         if (row[teamIdx] === nflAbbr || row[teamIdx] === searchAbbr) {
+          let rawHeight = row[heightIdx];
+          if (rawHeight) {
+            const inches = parseInt(rawHeight, 10);
+            if (!isNaN(inches) && inches > 30 && inches < 100) {
+              const feet = Math.floor(inches / 12);
+              const remainingInches = inches % 12;
+              rawHeight = `${feet}'${remainingInches}"`;
+            }
+          }
+
           players.push({
             id: row[idIdx] || Math.random().toString(),
             name: row[nameIdx],
             jersey: row[jerseyIdx],
             position: row[posIdx] || 'ATH',
-            teamId: teamId
+            teamId: teamId,
+            height: rawHeight || undefined,
+            weight: row[weightIdx] || undefined
           });
         }
       }

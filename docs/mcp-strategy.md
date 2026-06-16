@@ -1,5 +1,10 @@
 # RosterSync MCP Strategy: Server Suggestions
 
+> [!WARNING]
+> **ARCHIVED**: This document has been archived as part of the DAM-Only pivot. The MCP strategy is deferred to Phase 4 of the product roadmap.
+> 
+> *For the active MVP plan, see [DAM-Only Pivot: Implementation Plan](file:///Users/rymacmini/dev/rostersyncapi/docs/dam-only_implementation.md).*
+
 Based on our discussion and the architecture of the RosterSync data pipeline and API, here are 4 specific MCP (Model Context Protocol) server concepts. They are broken down into **External Revenue** (servers you build for your customers) and **Internal Pipeline** (servers you build or use to make your own agents smarter).
 
 ---
@@ -55,32 +60,29 @@ Based on our discussion and the architecture of the RosterSync data pipeline and
 
 ## 6. Pricing Strategy (The "MCP Upsell" Ladder)
 
-Based on current 2026 market trends for sports data and B2B SaaS, this tiered model perfectly positions the RosterSync Intelligence Server (MCP) as the ultimate enterprise value driver.
+Note: Tiers have been restructured for launch. MCP is a future-tier feature (Network/Enterprise). See `api-specification.md` for current live pricing.
 
-### 1. The Pro Tier: "The Production Specialist"
-**Price Point:** $499 / month  
+### 1. Studio Tier: "The Production Specialist" ($399/mo)
 **Target:** Regional sports networks and mid-sized digital media houses.
 
 *   **REST API Access:** Full use of the RosterSync dashboard and API.
 *   **Historical Data**: 5 years of historical archives.
-*   **Internal MomentumAgent:** Access to momentum reports within the UI.
-*   **MCP Access**: Available as a **$400/mo add-on**.
+*   **AI Phonetics + Translations**: Included.
+*   **MCP Access**: Available in Network tier (Q3 2026) and Enterprise.
 
-### 2. The Editorial AI Tier: "The AI-Native Newsroom"
-**Price Point:** $999 / month  
+### 2. Network Tier: "The AI-Native Newsroom" ($999/mo — Planned Q3 2026)
 **Target:** National digital publications, major sports blogs, and content agencies.
 
-*   **Everything in Pro.**
+*   **Everything in Studio.**
 *   **The Crown Jewel**: Official RosterSync Intelligence Server (MCP) included.
 *   **Plug-and-Play AI**: Editorial teams can plug this into Claude Desktop instantly.
 *   **Historical Data**: 10 years of historical archives.
-*   **Translations**: Includes AI Spanish/Mandarin translations.
+*   **Momentum Pulses**: Real-time narrative AI.
 
-### 3. The Enterprise Tier: "The Global Network"
-**Price Point:** $1,499 / month  
+### 3. Enterprise Tier: "The Global Network" ($2,499/mo)
 **Target:** Major networks (ESPN, Fox Sports), betting platforms, and broadcast partners.
 
-*   **Everything in Editorial AI.**
+*   **Everything in Network.**
 *   **The Actionable Advantage**: Full access to the `sync_to_dam` tool for Iconik/CatDV.
 *   **Historical Archive**: Full 25-year deep archive.
 *   **Custom Mapping**: Dedicated setup for complex field mappings in their DAM.

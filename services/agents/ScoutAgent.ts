@@ -65,7 +65,27 @@ export class ScoutAgent {
       if (leagueId.startsWith('milb-')) strategyKey = 'milb';
 
       const strategy = this.strategies[strategyKey] || this.strategies['default'];
-      return await strategy.fetch(leagueId, teamName, teamId, season, apiKey);
+      
+      // ESPN soccer API expects the starting year of the season (e.g. 2025 for the 2025-26 season)
+      // but the database stores the ending year (2026). Adjust the parameter here.
+      let strategySeason = season;
+      const espnSoccerCrossYearLeagues = [
+        'bundesliga', 'ger.1',
+        'premier-league', 'eng.1',
+        'la-liga', 'esp.1',
+        'serie-a', 'ita.1',
+        'ligue-1', 'fra.1',
+        'champions-league',
+        'europa-league',
+        'liga-mx', 'mex.1',
+        'eredivisie', 'ned.1',
+        'primeira-liga'
+      ];
+      if (espnSoccerCrossYearLeagues.includes(leagueId.toLowerCase())) {
+        strategySeason = season - 1;
+      }
+
+      return await strategy.fetch(leagueId, teamName, teamId, strategySeason, apiKey);
     } catch (err) {
       console.error(`[Scout] ❌ Failed for ${teamName}:`, err);
       return [];

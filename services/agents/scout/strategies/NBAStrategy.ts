@@ -79,9 +79,10 @@ export class NBAStrategy implements IRosterFetchingStrategy {
       return [];
     }
 
-    // Format season: 2024 -> 2024-25
-    const seasonEnd = (season + 1).toString().slice(-2);
-    const seasonStr = `${season}-${seasonEnd}`;
+    // Format season: 2026 (representing 2025-26) -> 2025-26
+    const startYear = season - 1;
+    const seasonEnd = season.toString().slice(-2);
+    const seasonStr = `${startYear}-${seasonEnd}`;
 
     const url = `https://stats.nba.com/stats/commonteamroster?LeagueID=00&Season=${seasonStr}&TeamID=${nbaId}`;
     
@@ -113,6 +114,8 @@ export class NBAStrategy implements IRosterFetchingStrategy {
       const jerseyIdx = headers.indexOf('NUM');
       const posIdx = headers.indexOf('POSITION');
       const idIdx = headers.indexOf('PLAYER_ID');
+      const heightIdx = headers.indexOf('HEIGHT');
+      const weightIdx = headers.indexOf('WEIGHT');
 
       // Validation: Ensure the API returned the requested season
       const returnedSeason = data.parameters?.Season;
@@ -126,7 +129,9 @@ export class NBAStrategy implements IRosterFetchingStrategy {
         name: row[nameIdx],
         jersey: row[jerseyIdx],
         position: row[posIdx] || 'ATH',
-        teamId: nbaId
+        teamId: nbaId,
+        height: heightIdx !== -1 ? row[heightIdx] : undefined,
+        weight: weightIdx !== -1 ? row[weightIdx] : undefined
       }));
 
     } catch (err) {

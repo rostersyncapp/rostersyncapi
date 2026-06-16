@@ -55,6 +55,8 @@ export class WNBAStrategy implements IRosterFetchingStrategy {
       const jerseyIdx = headers.indexOf('NUM');
       const posIdx = headers.indexOf('POSITION');
       const idIdx = headers.indexOf('PLAYER_ID');
+      const heightIdx = headers.indexOf('HEIGHT');
+      const weightIdx = headers.indexOf('WEIGHT');
 
       // Validation: Ensure the API returned the requested season
       const returnedSeason = data.parameters?.Season;
@@ -68,7 +70,9 @@ export class WNBAStrategy implements IRosterFetchingStrategy {
         name: row[nameIdx],
         jersey: row[jerseyIdx],
         position: row[posIdx] || 'ATH',
-        teamId: wnbaId
+        teamId: wnbaId,
+        height: heightIdx !== -1 ? row[heightIdx] : undefined,
+        weight: weightIdx !== -1 ? row[weightIdx] : undefined
       }));
 
     } catch (err) {

@@ -1,3 +1,4 @@
+import { IRosterFetchingStrategy, RosterPlayer } from '../types.ts';
 import { fetchNCAARosterFromCore, resolveTeamInfo } from '../utils.ts';
 
 /**

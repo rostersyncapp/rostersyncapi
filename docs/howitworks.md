@@ -1,65 +1,66 @@
-# How It Works: The RosterSync Delivery Architecture
+# How It Works: The RosterSync DAM Automation Architecture
 
-RosterSync uses three distinct delivery methods to get athlete intelligence into the hands of broadcast professionals. The method used depends entirely on the type of machine or system consuming the data.
-
----
-
-## 1. Broadcast Graphics (Chyron, Vizrt, Ross) 
-**Method:** They PULL from us via the **REST API**
-
-Broadcast graphics engines are traditionally script-heavy and rely on explicit data-binding. A graphics operator running Ross XPression or Vizrt will write a script that makes a standard `GET` request to your API (e.g., `GET /v1/teams/edm/roster`).
-
-*   **How it works:** The graphics system provides its RosterSync API Key, RosterSync returns a standard JSON payload with the phonetics and stats, and the graphics engine automatically renders the lower-third graphic on the TV broadcast.
-*   **Why we need it:** These legacy, high-reliability systems cannot talk to an MCP server natively. They require standard, predictable REST JSON endpoints. The REST API is the absolute foundation of the product.
+RosterSync operates as an automated metadata delivery service that connects professional roster intelligence directly to Digital Asset Management (DAM) systems and media production pipelines.
 
 ---
 
-## 2. MAM & DAM Systems (Iconik, CatDV) 
-**Method:** We PUSH to them via **Native Connectors**
+## 1. Data Acquisition & AI Enrichment (The Core Pipeline)
 
-As mapped out in the Phase 4 Strategy, RosterSync does not wait for a DAM like Iconik to ask for data. Instead, RosterSync actively pushes it to them to keep their metadata perfectly synchronized.
+RosterSync's multi-agent data pipeline gathers, verifies, and enriches roster data automatically before it is pushed to customer platforms.
 
-*   **How it works:** The customer enters their Iconik/CatDV API credentials into the RosterSync UI. When the `ScoutAgent` detects that a player's status or momentum has changed, the internal `ConnectorAgent` wakes up, authenticates directly with the customer's DAM database using the stored credentials, and updates the metadata on their video clips automatically.
-*   **The benefit:** Zero code is required from the customer. They simply map the data fields in the RosterSync UI, and the autonomous agents do all the heavy lifting.
-
----
-
-## 3. Enterprise AI Assistants (Claude, Custom Bots)
-**Method:** They QUERY us via the **MCP Server**
-
-This is the newest intelligence layer. If a major network builds an internal "StatsBot" in Slack for their journalists, or uses Claude Desktop in the newsroom, they don't want to write complex REST API integration scripts just to look up a player's phonetic spelling.
-
-*   **How it works:** The enterprise installs the RosterSync MCP Server. Now, their custom chatbots and AI assistants natively understand how to use RosterSync's tools (`get_athlete_phonetics`, `get_athlete_momentum`). A journalist can just type naturally: *"Give me a 10-second intro for Connor McDavid tonight,"* and the AI will pull the live data seamlessly to write the script.
-*   **The benefit:** This turns RosterSync from a developer tool into a plug-and-play knowledge base for any AI agent on the market.
+* **Step 1: Raw Extraction (ScoutAgent):** Fetches raw roster data (names, jersey numbers, positions, heights/weights) from official league APIs.
+* **Step 2: AI Enrichment (LinguistAgent & Scraping Agents):** Automatically generates broadcast-ready phonetic pronunciations, full IPA guides, Mandarin/Spanish translations, and scrapes biographical histories.
+* **Step 3: Normalized Database:** The enriched data is saved to a secure Supabase PostgreSQL instance, adhering to strict data integrity and historical accuracy guidelines (never deleting, only deactivating/updating).
 
 ---
 
-## 4. OpenAI & Codex Assistants (ChatGPT, GitHub Copilot)
-**Method:** They BIND to us via **OpenAPI Actions**
+## 2. Connected DAM Systems (ConnectorAgent)
 
-For clients who prefer the OpenAI ecosystem, RosterSync provides an "OpenAI Translator" bridge.
+RosterSync does not require developers to poll a REST API. Instead, our native connectors actively push data directly to your asset libraries to keep tags current.
 
-*   **How it works:** We provide a standard OpenAPI (Swagger) JSON specification. The client pastes this URL into their **Custom GPT** or **OpenAI Assistant** "Actions" configuration.
-*   **The benefit:** This allows ChatGPT and Codex-based tools to call our `get_athlete_phonetics` and `get_athlete_momentum` tools as if they were native REST functions. It ensures 100% coverage across all major AI platforms.
-
----
-
-## 5. Broadcaster GUI (RosterSync Hub)
-**Method:** Human-Interfaced Dashboard via **Web Application**
-
-The "RosterSync Hub" is the high-fidelity interface where human broadcasters interact with the data.
-
-*   **How it works:** The web app queries the same Supabase backend used by the API and Agents. It leverages the **team colors and logos already stored in the `teams` table** to dynamically theme the interface per matchup.
-*   **The Spotter Board:** This specialized view uses the stored brand assets to create a color-coded, "glanceable" map of the rosters. It also embeds the MCP Assistant directly in the sidebar, giving the broadcaster a real-time AI research partner in the booth.
-*   **Historical Access:** Because the app is built on the core API, it natively supports searching through 25 years of historical rosters and biographical data.
+* **Iconik Integration:** Direct integration via the Iconik API. Automatically maps, creates, and updates custom fields and dropdown options for assets.
+* **Quantum CatDV:** Native integration using CatDV REST APIs to automatically align metadata schemas and push tags directly to media catalog items.
+* **Custom Webhooks:** Pushes payload-safe JSON events (e.g. `ping`, `roster_update`) directly to customer-defined endpoints on roster changes, complete with HMAC SHA-256 signatures for validation.
 
 ---
 
-## 6. Data Safety & Disaster Recovery
-**Method:** Off-Platform Redundancy via **Backblaze B2**
+## 3. Automation & Synchronization Flow
 
-RosterSync treats sports history as a digital asset that must be preserved indefinitely.
+RosterSync keeps your media production environment automatically aligned with live sports ops.
 
-*   **Nightly Exports:** Every 24 hours, an automated pipeline exports the entire PostgreSQL database and the Cloudflare KV cache.
-*   **Cold Storage:** These archives are compressed and uploaded to **Backblaze B2**, an independent cloud storage provider.
-*   **The "3-2-1" Rule:** Your data lives in three places (Supabase, Cloudflare, and Backblaze), on two different storage types, with one copy being off-platform. This ensures that even in a catastrophic platform failure, your historical rosters are recoverable in minutes.
+```
+┌─────────────────┐      ┌─────────────────┐      ┌─────────────────┐
+│  Scout Agent /  │ ───> │ Supabase DB     │ ───> │ Vercel Webhook  │
+│  Enrichment     │      │ (Rosters Table) │      │ (Roster Change) │
+└─────────────────┘      └─────────────────┘      └─────────────────┘
+                                                           │
+                                                           ▼
+┌─────────────────┐      ┌─────────────────┐      ┌─────────────────┐
+│ Enterprise DAM  │ <─── │ ConnectorAgent  │ <─── │   Job Queue     │
+│ (Iconik/CatDV)  │      │ (Worker Sync)   │      │  (Enqueued)     │
+└─────────────────┘      └─────────────────┘      └─────────────────┘
+```
+
+1. **Change Detection:** Supabase database webhooks fire on inserts or updates to the `reference_rosters` table.
+2. **Verification & Scope Matching:** The webhook calls the Vercel backend (`/api/webhooks/roster-change`), which identifies which active DAM connections are configured to sync that specific team, league, or season.
+3. **Queue Processing:** The system enqueues a `dam_connector` job for each affected connection.
+4. **Active Delivery:** Background worker processes execute the job, calling the respective DAM APIs to update metadata tags without human intervention.
+
+---
+
+## 4. Broadcaster Control Panel (RosterSync Hub)
+
+A clean, high-fidelity user dashboard allows broadcast managers to control the sync flow.
+
+* **Integrations Wizard:** Simple forms to securely enter base URLs and API credentials. Credentials are encrypted at rest via AES-256-GCM.
+* **Sync Scope Filters:** Configure each connection to target all leagues or restrict synchronization to specific leagues, teams, or seasons.
+* **Custom Field Mapping:** An advanced mapper tool that maps RosterSync metadata fields (e.g., `phonetic_name`, `team_primary_color`) to your DAM's specific custom field IDs.
+* **Manual Overrides:** A "Sync Now" trigger to instantly run a full synchronization, alongside a 50-event delivery log modal to inspect payload logs and error codes.
+
+---
+
+## 5. Off-Platform Redundancy
+
+To protect decades of historical archives, RosterSync features automated backups:
+* **Nightly Backups:** Compresses and exports the PostgreSQL database.
+* **Backblaze B2 Cold Storage:** Backups are securely uploaded to Backblaze B2, enforcing the "3-2-1" backup rule (3 copies, 2 media types, 1 off-site).

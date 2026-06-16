@@ -51,7 +51,7 @@ export class MLBStrategy implements IRosterFetchingStrategy {
     console.log(`[MLBStrategy] Map: ${teamName} -> MLB ID ${activeId}`);
 
     // 2. Fetch the roster
-    const url = `${this.MLB_STATS_API}/teams/${activeId}/roster?season=${season}`;
+    const url = `${this.MLB_STATS_API}/teams/${activeId}/roster?season=${season}&hydrate=person(height,weight)`;
     const res = await fetch(url);
     const data = await res.json();
     
@@ -60,7 +60,9 @@ export class MLBStrategy implements IRosterFetchingStrategy {
       name: p.person.fullName,
       jersey: p.jerseyNumber,
       position: p.position.abbreviation,
-      teamId: activeId.toString()
+      teamId: activeId.toString(),
+      height: p.person.height,
+      weight: p.person.weight ? p.person.weight.toString() : undefined
     }));
   }
 }

@@ -1,7 +1,7 @@
 {
   "compilerOptions": {
     "target": "ES2022",
-    "module": "UA",
+    "module": "esnext",
     "moduleResolution": "Bundler",
     "lib": ["ES2022"],
     "strict": true,

@@ -46,11 +46,12 @@ We are the first to market with an **Enterprise-grade MCP Server.** In a 2026 wo
 Broadcasters currently spend hundreds of hours manually logging metadata in **CatDV** or **Iconik**. By offering native, autonomous connectors, RosterSync removes the technical burden that legacy providers ignore.
 
 ### D. Cost Efficiency
-RosterSync provides a tiered "Intelligence Path" ($499 - $1,499) that is significantly cheaper than a broadcaster trying to license Sportradar ($5k+/mo) and NameCoach ($2k+/mo) separately.
+RosterSync provides a tiered "Intelligence Path" ($399 - $2,499) that is significantly cheaper than a broadcaster trying to license Sportradar ($5k+/mo) and NameCoach ($2k+/mo) separately.
 
-- **Pro ($499)**: The entry point for verified phonetics.
-- **Editorial AI ($999)**: The AI-native sweet spot for newsrooms using MCP.
-- **Enterprise ($1,499)**: The full automated broadcast engine with DAM sync.
+- **Indie ($199)**: DAM sync + graphics exports for single teams and college programs.
+- **Studio ($399)**: The entry point for verified phonetics + translations + 2 DAM connections.
+- **Network ($999, planned)**: The AI-native sweet spot for newsrooms using MCP.
+- **Enterprise ($2,499)**: The full automated broadcast engine with DAM sync, Spotter Board, and Booth Mode.
 
 ---
 
